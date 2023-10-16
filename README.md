@@ -1,19 +1,19 @@
 ## Elasticsearch training lab
-This is a simple lab environment for training and experimenting with Elasticsearch 7.4.0.
+이 프로젝트는 Elasticsearch 8.1.3을 교육하고 실험하기 위한 간단한 랩 환경입니다.
 
-It will build nodes running on CentOS, and provision them with the required system settings to run Elasticsearch on a non-local IP. It's a naive method of provisioning but it's suitable for our requirements.
+CentOS에서 실행되는 노드를 구축하고 로컬이 아닌 IP에서 Elasticsearch를 실행하는 데 필요한 시스템 설정으로 노드를 프로비저닝합니다. 이는 소박한 프로비저닝 방법이지만 우리의 요구 사항에 적합합니다.
 
-The lab is designed purely as a training tool. It doesn't use all the best practices for a production cluster and shouldn't be considered suitable for one.
+랩은 순전히 교육 도구로 설계되었습니다. 프로덕션 클러스터에 대한 모든 모범 사례를 사용하지 않으며 프로덕션 클러스터에 적합한 것으로 간주되어서는 안 됩니다.
 
-If you are studying for Elastic Certified Engineer, or you've been on the Elasticsearch Engineer I and/or II courses, this lab will help you get familiar with the environment used in the exam and run the labs from the courses. The main difference is that we're using Vagrant here so need to run `vagrant ssh` instead of just `ssh`. If you would rather use SSH directly, you'll need to do some work to copy your public keys into the VMs.
+Elastic Certified Engineer를 공부 중이거나 Elasticsearch Engineer I 및/또는 II 과정을 수강한 경우, 이 실습은 시험에 사용되는 환경에 익숙해지고 과정에서 실습을 실행하는 데 도움이 될 것입니다. 가장 큰 차이점은 여기서는 Vagrant를 사용하므로 ssh 대신 vagrant ssh를 실행해야 한다는 것입니다. SSH를 직접 사용하려면 공개 키를 VM에 복사하기 위한 몇 가지 작업을 수행해야 합니다.
 
 ### Dependencies
 These two archives are required:
-- [Elasticsearch 7.4.0](https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-7.4.0-linux-x86_64.tar.gz)
-- [Kibana 7.4.0](https://artifacts.elastic.co/downloads/kibana/kibana-7.4.0-linux-x86_64.tar.gz)
+- [Elasticsearch 8.1.3](https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-8.1.3-linux-x86_64.tar.gz)
+- [Kibana 8.1.3](https://artifacts.elastic.co/downloads/kibana/kibana-8.1.3-linux-x86_64.tar.gz)
 
 ### Settings summary
-- Each VM is given 1G RAM.
+- Each VM is given 4G RAM.
 - Elasticsearch is configured (in `jvm.options`) with a 512M heap - [50% available RAM](https://www.elastic.co/guide/en/elasticsearch/reference/current/heap-size.html).
 - The number of file descriptors [is increased](https://www.elastic.co/guide/en/elasticsearch/reference/current/file-descriptors.html).
 - The number of threads [is increased](https://www.elastic.co/guide/en/elasticsearch/reference/current/max-number-of-threads.html).
@@ -28,13 +28,13 @@ These two archives are required:
 - `cd` into the repo
 - Run `vagrant up`
 
-Without modifying `Vagrantfile`, Vagrant will spin up two VMs; one Elasticsearch node (`10.0.200.101`) and one instance of Kibana (`10.0.200.104`).
+`Vagrantfile`을 수정하지 않고 Vagrant는 두 개의 VM( Elasticsearch 노드 1개(`10.0.200.101`)와 Kibana 인스턴스 1개(`10.0.200.104`) )을 가동합니다.
 
-To start Elasticsearch, you can `vagrant ssh node1` and run `elasticsearch-7.4.0/bin/elasticsearch`. 
+Elasticsearch를 시작하려면 `vagrant ssh node1`을 실행하고 `elasticsearch-8.1.3/bin/elasticsearch`를 실행하면 됩니다.
 
-To start Kibana, you'll need to `vagrant ssh node4` and run `kibana-7.4.0/bin/kibana`. 
+Kibana를 시작하려면 `vagrant ssh node4`를 실행하고 `kibana-8.1.3/bin/kibana`를 실행해야 합니다.
 
-If you need more nodes, you can uncomment the provisioners for `node2` and `node3`, then run `vagrant up` again. When you start Elasticsearch on those nodes, they'll automatically join the cluster and shard reallocation will begin.
+더 많은 노드가 필요한 경우 `node2` 및 `node3`에 대한 프로비저너의 주석 처리를 해제한 다음 `vagrant up`을 다시 실행할 수 있습니다. 해당 노드에서 Elasticsearch를 시작하면 자동으로 클러스터에 참여하고 샤드 재할당이 시작됩니다.
 
 ### Resetting
-If you've been using the environment and want/need to burn everything down and start from scratch, you can use `vagrant destroy`. This will delete the VMs so the next time you `vagrant up`, you'll get a brand new cluster.
+환경을 사용해왔고 모든 것을 불태우고 처음부터 시작하고 싶거나 필요하다면 `vagrant destroy`를 사용할 수 있습니다. 이렇게 하면 VM이 삭제되므로 다음에 `vagrant up`할 때 완전히 새로운 클러스터를 얻게 됩니다.

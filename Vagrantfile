@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
-    vb.memory = "1024"
+    vb.memory = "4096"
   end
 
   config.vm.define "node1" do |node1|
