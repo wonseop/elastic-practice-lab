@@ -5,7 +5,7 @@ Vagrant.configure("2") do |config|
   config.vm.box = "centos/7"
 
   config.vm.provision "shell", path: "provision_privileged.sh", privileged: true
-  
+
   config.vm.provider "virtualbox" do |vb|
     vb.gui = false
     vb.memory = "4096"
