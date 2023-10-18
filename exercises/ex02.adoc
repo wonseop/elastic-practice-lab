@@ -1,0 +1,476 @@
+
+
+== Question 13
+
+Reindex the data in the `olympic-events` index into the new `olympic-events-fixed` index created in exercise 12 using the `split_games` pipeline created in exercise 10.
+
+Question 10에서 생성된 `split_games` 파이프라인을 사용하여 `olympic-events` 인덱스의 데이터를 Question 12에서 생성된 새로운 `olympic-events-fixed` 인덱스로 다시 인덱싱하세요.
+
+=== Answer
+[source]
+----
+POST _reindex
+{
+  "source": {
+    "index": "olympic-events"
+  },
+  "dest": {
+    "index": "olympic-events-fixed",
+    "pipeline": "split_games"
+  }
+}
+
+# timeout이 발생했다면 다음을 추가 실행
+POST olympic-events-fixed/_refresh
+----
+
+
+== Question 14
+
+Look at the mapping for the `olympic-events-fixed` index. Notice how Elasticsearch has created new fields. We created the mapping for this index with the same field names as before but we put all the field names in lowercase. Field names are case sensitive, so `Age` and `age` are different, distinct fields to Elasticsearch.
+
+`olympic-events-fixed` 인덱스에 대한 매핑을 살펴보세요. Elasticsearch가 어떻게 새로운 필드를 생성했는지 살펴보세요. 이전과 동일한 필드 이름을 사용하여 이 인덱스에 대한 매핑을 만들었지만 모든 필드 이름을 소문자로 입력했습니다. 필드 이름은 대소문자를 구분하므로 `Age`와 `age`는 Elasticsearch에서 서로 다른 별개의 필드입니다.
+
+Also notice that the new mapping uses `athleteId` instead of `ID`, `athleteName` instead of `Name` and `gender` instead of `Sex`.
+
+또한 새 매핑에서는 `ID` 대신 `athleteId`, `Name` 대신 `athleteName`, `Sex` 대신 `gender`를 사용합니다.
+
+We'll need to correct this by tearing down the new index and reindexing with an additional pipeline to use the correct field names. To save us constantly having to recreate the index with the right mappings, we can leverage index templates.
+
+올바른 필드 이름을 사용하려면 새 인덱스를 해제하고 추가 파이프라인으로 다시 인덱싱하여 이 문제를 해결해야 합니다. 올바른 매핑으로 인덱스를 계속해서 다시 생성해야 하는 수고를 덜기 위해 인덱스 템플릿을 활용할 수 있습니다.
+
+Create an index template called `olympic-events` for new indices with a name beginning with `olympic-events-`. Use the mapping and settings we defined in exercise 12 and configure the mapping so Elasticsearch will throw an exception if a document contains a field not defined in the mapping.
+
+이름이 `olympic-events-`로 시작하는 새 인덱스에 대해 `olympic-events`라는 인덱스 템플릿을 만듭니다. 연습 12에서 정의한 매핑과 설정을 사용하고 문서에 매핑에 정의되지 않은 필드가 포함된 경우 Elasticsearch에서 예외가 발생하도록 매핑을 구성하세요.
+
+=== Answer
+1. mapping 정보를 확인
+[]
+----
+GET olympic-events-fixed/_mapping
+----
+
+[start=2]
+2. 문제 설명대로 대소문자 필드명과 같은 내용을 다루는 필드명이 존재함.
+[]
+----
+{
+  "olympic-events-fixed" : {
+    "mappings" : {
+      "properties" : {
+        "Age" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "City" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "Event" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "Height" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "ID" : {
+          "type" : "long"
+        },
+        "Medal" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "NOC" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "Name" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "Sex" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "Sport" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "Team" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "Weight" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "season" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        },
+        "year" : {
+          "type" : "text",
+          "fields" : {
+            "keyword" : {
+              "type" : "keyword",
+              "ignore_above" : 256
+            }
+          }
+        }
+      }
+    }
+  }
+}
+----
+[start=3]
+3. 기존 매핑 구조를 가지고, 인덱스 패턴을 지정하고, 동적 매핑을 제한하는 인덱스 템플릿 생성
+[]
+----
+#https://www.elastic.co/guide/en/elasticsearch/reference/current/index-templates.html
+PUT _index_template/olympic-events
+{
+  "index_patterns": [
+    "olympic-events-*"
+  ],
+  "template": {
+    "settings": {
+      "number_of_shards": 1,
+      "number_of_replicas": 0
+    },
+    "mappings": {
+      "dynamic": "strict",
+      "properties": {
+        "athleteId": {
+          "type": "integer"
+        },
+        "age": {
+          "type": "short"
+        },
+        "height": {
+          "type": "short"
+        },
+        "weight": {
+          "type": "short"
+        },
+        "athleteName": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "gender": {
+          "type": "keyword"
+        },
+        "team": {
+          "type": "keyword"
+        },
+        "noc": {
+          "type": "keyword"
+        },
+        "year": {
+          "type": "short"
+        },
+        "season": {
+          "type": "keyword"
+        },
+        "city": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "sport": {
+          "type": "keyword"
+        },
+        "event": {
+          "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
+        },
+        "medal": {
+          "type": "keyword"
+        }
+      }
+    }
+  }
+}
+----
+
+
+== Question 15
+
+Create a new ingest pipeline called `reconcile_fields` to replace all fields with their correct field names (except for the `Games` field), then also execute the `split_games` pipeline.
+
+`reconcile_fields` 라는 새로운 ingest pipeline을 생성하여 모든 필드를 올바른 필드 이름으로 바꾼 다음(`Games` 필드 제외), `split_games` 파이프라인도 실행합니다.
+
+=== Answer
+[]
+----
+PUT _ingest/pipeline/reconcile_fields
+{
+  "processors": [
+    {
+      "rename": {
+        "field": "ID",
+        "target_field": "athleteId"
+      }
+    },
+    {
+      "rename": {
+        "field": "Name",
+        "target_field": "athleteName"
+      }
+    },
+    {
+      "rename": {
+        "field": "Age",
+        "target_field": "age"
+      }
+    },
+    {
+      "rename": {
+        "field": "Height",
+        "target_field": "height"
+      }
+    },
+    {
+      "rename": {
+        "field": "Weight",
+        "target_field": "weight"
+      }
+    },
+    {
+      "rename": {
+        "field": "Sex",
+        "target_field": "gender"
+      }
+    },
+    {
+      "rename": {
+        "field": "Team",
+        "target_field": "team"
+      }
+    },
+    {
+      "rename": {
+        "field": "NOC",
+        "target_field": "noc"
+      }
+    },
+    {
+      "rename": {
+        "field": "Sport",
+        "target_field": "sport"
+      }
+    },
+    {
+      "rename": {
+        "field": "Event",
+        "target_field": "event"
+      }
+    },
+    {
+      "rename": {
+        "field": "City",
+        "target_field": "city"
+      }
+    },
+    {
+      "rename": {
+        "field": "Medal",
+        "target_field": "medal"
+      }
+    },
+    {
+      "pipeline": {
+        "name": "split_games"
+      }
+    }
+  ]
+}
+----
+
+== Question 16
+Test your new pipeline with the following document:
+
+다음 문서를 사용하여 새 파이프라인을 테스트하세요:
+
+[]
+----
+{
+  "NOC": "ARG",
+  "Sex": "M",
+  "City": "Los Angeles",
+  "Weight": "98",
+  "Name": "Ernesto Arturo Alas",
+  "Sport": "Shooting",
+  "Games": "1984 Summer",
+  "Event": "Shooting Men's Free Pistol, 50 metres",
+  "Height": "186",
+  "Team": "Argentina",
+  "ID": 2224,
+  "Medal": "NA",
+  "Age": "54"
+}
+----
+
+=== Answer
+[]
+----
+POST _ingest/pipeline/reconcile_fields/_simulate
+{
+  "docs": [
+    {
+      "_source": {
+        "NOC": "ARG",
+        "Sex": "M",
+        "City": "Los Angeles",
+        "Weight": "98",
+        "Name": "Ernesto Arturo Alas",
+        "Sport": "Shooting",
+        "Games": "1984 Summer",
+        "Event": "Shooting Men's Free Pistol, 50 metres",
+        "Height": "186",
+        "Team": "Argentina",
+        "ID": 2224,
+        "Medal": "NA",
+        "Age": "54"
+      }
+    }
+  ]
+}
+
+# 결과
+{
+  "docs" : [
+    {
+      "doc" : {
+        "_index" : "_index",
+        "_id" : "_id",
+        "_source" : {
+          "noc" : "ARG",
+          "gender" : "M",
+          "city" : "Los Angeles",
+          "year" : "1984",
+          "weight" : "98",
+          "team" : "Argentina",
+          "athleteId" : 2224,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Ernesto Arturo Alas",
+          "event" : "Shooting Men's Free Pistol, 50 metres",
+          "sport" : "Shooting",
+          "age" : "54",
+          "height" : "186"
+        },
+        "_ingest" : {
+          "timestamp" : "2023-10-18T05:55:44.666778243Z"
+        }
+      }
+    }
+  ]
+}
+----
+
+
+== Question 17
+Delete the `olympic-events-fixed` index.
+
+`olympic-events-fixed` 인덱스를 삭제하세요.
+
+=== Answer
+[]
+----
+DELETE olympic-events-fixed
+----
+
+== Question 18
+Reindex the data in the `olympic-events` index into a new `olympic-events-fixed` index using the `reconcile_fields` pipeline. If Elasticsearch throws any exceptions, you may have missed a field in your pipeline.
+
+`reconcile_fields` 파이프라인을 사용하여 `olympic-events` 인덱스의 데이터를 새로운 `olympic-events-fixed` 인덱스로 재색인하십시오. Elasticsearch에서 예외가 발생하면 파이프라인에서 필드를 놓친 것일 수 있습니다.
+
+=== Answer
+[]
+----
+POST _reindex
+{
+  "source": {
+    "index": "olympic-events"
+  },
+  "dest": {
+    "index": "olympic-events-fixed",
+    "pipeline": "reconcile_fields"
+  }
+}
+
+# timeout이 발생했다면 다음을 추가 실행
+POST olympic-events-fixed/_refresh
+----
