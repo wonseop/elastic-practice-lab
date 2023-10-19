@@ -5,6 +5,79 @@ Write a query to return the first 50 documents for gold medal athletics events, 
 
 금메달 육상 경기(athletics events)의 처음 50개 문서를 내림차순으로 반환하는 쿼리를 작성합니다.
 
+=== Solution
+- link:https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-term-query.html[Term query]
+- link:https://www.elastic.co/guide/en/elasticsearch/reference/8.10/sort-search-results.html[Sort search results]
+
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "size": 50,
+  "query": {
+    "term": {
+      "medal": "Gold"
+    }
+  },
+  "sort": [
+    {
+      "age": {
+        "order": "desc"
+      }
+    }
+  ]
+}
+----
+
+결과
+[]
+----
+{
+  "took" : 4,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : null,
+    "hits" : [
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "zxuJO4sB9RbpwGsW7qda",
+        "_score" : null,
+        "_source" : {
+          "noc" : "AUS",
+          "gender" : "M",
+          "city" : "Tokyo",
+          "year" : "1964",
+          "weight" : "81",
+          "team" : "Barrenjoey",
+          "athleteId" : 87000,
+          "medal" : "Gold",
+          "season" : "Summer",
+          "athleteName" : """William Herbert "Bill" Northam""",
+          "event" : "Sailing Mixed 5.5 metres",
+          "sport" : "Sailing",
+          "age" : "59",
+          "height" : "183"
+        },
+        "sort" : [
+          59
+        ]
+      },
+      ...
+    }
+  }
+}
+----
+
 == Exercise 26
 Write a query to match swimming events where either:
 
@@ -16,21 +89,398 @@ Enhance the query so the results identify whether the weight, age, or both match
 다음 중 하나에 해당하는 수영 이벤트와 일치하는 쿼리를 작성합니다.
 
 - 선수의 체중은 60kg에서 70kg 사이였습니다
-- 선수의 나이는 20 세 미만이었습니다
+- 선수의 나이는 20세 미만이었습니다
 
 결과가 체중, 연령 또는 둘 다 검색 기준과 일치하는지 여부를 식별할 수 있도록 쿼리를 개선합니다.
 
+=== Solution
+- link:https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-range-query.html[range query]
+- link:https://www.elastic.co/guide/en/elasticsearch/reference/current/query-dsl-minimum-should-match.html[minium_should_match]
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "query": {
+    "bool": {
+      "filter": {
+        "term": {
+          "sport": "Swimming"
+        }
+      },
+      "should": [
+        {
+          "range": {
+            "weight": {
+              "_name": "weight",
+              "gte": 60,
+              "lte": 70
+            }
+          }
+        },
+        {
+          "range": {
+            "age": {
+              "_name": "age",
+              "lt": 20
+            }
+          }
+        }
+      ],
+      "minimum_should_match": 1
+    }
+  }
+}
+----
+
+결과
+[]
+----
+{
+  "took" : 4,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : 2.0,
+    "hits" : [
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "-xqJO4sB9RbpwGsWzY6s",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "BUL",
+          "gender" : "F",
+          "city" : "Seoul",
+          "year" : "1988",
+          "weight" : "60",
+          "team" : "Bulgaria",
+          "athleteId" : 59460,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Natasha Khristova",
+          "event" : "Swimming Women's 100 metres Freestyle",
+          "sport" : "Swimming",
+          "age" : "18",
+          "height" : "165"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "_BqJO4sB9RbpwGsWzY6s",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "BUL",
+          "gender" : "F",
+          "city" : "Seoul",
+          "year" : "1988",
+          "weight" : "60",
+          "team" : "Bulgaria",
+          "athleteId" : 59460,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Natasha Khristova",
+          "event" : "Swimming Women's 4 x 100 metres Medley Relay",
+          "sport" : "Swimming",
+          "age" : "18",
+          "height" : "165"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "qBqJO4sB9RbpwGsWzY-s",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "RUS",
+          "gender" : "F",
+          "city" : "Sydney",
+          "year" : "2000",
+          "weight" : "61",
+          "team" : "Russia",
+          "athleteId" : 59530,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Yekaterina Kibalo",
+          "event" : "Swimming Women's 50 metres Freestyle",
+          "sport" : "Swimming",
+          "age" : "18",
+          "height" : "170"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "qRqJO4sB9RbpwGsWzY-s",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "RUS",
+          "gender" : "F",
+          "city" : "Sydney",
+          "year" : "2000",
+          "weight" : "61",
+          "team" : "Russia",
+          "athleteId" : 59530,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Yekaterina Kibalo",
+          "event" : "Swimming Women's 100 metres Freestyle",
+          "sport" : "Swimming",
+          "age" : "18",
+          "height" : "170"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "qhqJO4sB9RbpwGsWzY-s",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "RUS",
+          "gender" : "F",
+          "city" : "Sydney",
+          "year" : "2000",
+          "weight" : "61",
+          "team" : "Russia",
+          "athleteId" : 59530,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Yekaterina Kibalo",
+          "event" : "Swimming Women's 4 x 100 metres Freestyle Relay",
+          "sport" : "Swimming",
+          "age" : "18",
+          "height" : "170"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "JBqJO4sB9RbpwGsWzZGs",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "NOR",
+          "gender" : "M",
+          "city" : "Munich",
+          "year" : "1972",
+          "weight" : "70",
+          "team" : "Norway",
+          "athleteId" : 59712,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Sverre Arnold Kile",
+          "event" : "Swimming Men's 400 metres Freestyle",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "186"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "JRqJO4sB9RbpwGsWzZGs",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "NOR",
+          "gender" : "M",
+          "city" : "Munich",
+          "year" : "1972",
+          "weight" : "70",
+          "team" : "Norway",
+          "athleteId" : 59712,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Sverre Arnold Kile",
+          "event" : "Swimming Men's 400 metres Individual Medley",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "186"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "nBqJO4sB9RbpwGsWzZGt",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "KOR",
+          "gender" : "M",
+          "city" : "Tokyo",
+          "year" : "1964",
+          "weight" : "70",
+          "team" : "South Korea",
+          "athleteId" : 59772,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Kim Bong-Jo",
+          "event" : "Swimming Men's 100 metres Freestyle",
+          "sport" : "Swimming",
+          "age" : "18",
+          "height" : "173"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "nRqJO4sB9RbpwGsWzZGt",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "KOR",
+          "gender" : "M",
+          "city" : "Tokyo",
+          "year" : "1964",
+          "weight" : "70",
+          "team" : "South Korea",
+          "athleteId" : 59772,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Kim Bong-Jo",
+          "event" : "Swimming Men's 400 metres Freestyle",
+          "sport" : "Swimming",
+          "age" : "18",
+          "height" : "173"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "hhqJO4sB9RbpwGsWzZSt",
+        "_score" : 2.0,
+        "_source" : {
+          "noc" : "SWE",
+          "gender" : "F",
+          "city" : "Moskva",
+          "year" : "1980",
+          "weight" : "67",
+          "team" : "Sweden",
+          "athleteId" : 32943,
+          "medal" : "NA",
+          "season" : "Summer",
+          "athleteName" : "Berith Agneta Eriksson",
+          "event" : "Swimming Women's 100 metres Freestyle",
+          "sport" : "Swimming",
+          "age" : "15",
+          "height" : "179"
+        }
+      }
+    ]
+  }
+}
+----
+
 == Exercise 27
-Download the file of National Olympic Committees from here and use Kibana’s Data Visualizer to import the data into a new index called olympic-noc-regions.
+Download the file of National Olympic Committees link:./assets/events-nocs.ndjson[from here] and use Kibana’s Data Visualizer to import the data into a new index called `olympic-noc-regions`.
+
+link:./assets/events-nocs.ndjson[여기에서] 국가 올림픽 위원회 파일을 다운로드하고 Kibana의 데이터 시각화 도구를 사용하여 `olympic-noc-regions` 라는 새로운 인덱스로 데이터를 가져옵니다.
+
+=== Solution
+Exercise 03를 참고하여 `olympic-noc-regions` 인덱스 생성
 
 == Exercise 28
 Change the number of replica shards for the olympic-noc-regions index to be 0. The index should then be green and contain 230 documents.
 
+olympic-noc-regions 인덱스의 복제본 샤드 수를 0으로 변경합니다. 그러면 인덱스는 녹색이 되고 230개의 문서를 포함해야 합니다.
+
+=== Solution
+리플리카를 0로 설정
+[]
+----
+PUT olympic-noc-regions/_settings
+{
+  "number_of_replicas": 0
+}
+----
+
+인덱스 상태 확인
+[]
+----
+GET _cat/indices/olympic-noc-regions?v
+
+# 결과
+health status index               uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   olympic-noc-regions RrxWd_pKS3a3TsPZZSL-Hg   1   0        230            0     21.4kb         21.4kb
+----
+
 == Exercise 29
-Create an enrich policy and ingest pipeline that uses the enrich processor to add details of the National Olympic Committee to each document in the olympic-events-fixed index. Call the policy olympic-noc-append and the pipeline enrich-noc. Add details of the matching NOC entry to a new field called nocDetails, matching on the noc field.
+Create an enrich policy and ingest pipeline that uses the enrich processor to add details of the National Olympic Committee to each document in the olympic-events-fixed index. Call the policy `olympic-noc-append` and the pipeline `enrich-noc`. Add details of the matching NOC entry to a new field called nocDetails, matching on the noc field.
+
+Enrich processor를 사용하여 olympic-events-fixed 인덱스의 각 문서에 국가 올림픽 위원회의 세부정보를 추가하는 enrich policy 및 ingest pipeline을 만듭니다. 정책 `olympic-noc-append` 및 파이프라인 `enrich-noc`를 호출합니다. noc 필드와 일치하는 nocDetails라는 새 필드에 일치하는 NOC 항목의 세부정보를 추가합니다.
+
+=== Solution
+정책 만들기
+[]
+----
+PUT _enrich/policy/olympic-noc-append
+{
+  "match": {
+    "indices": "olympic-noc-regions",
+    "match_field": "noc",
+    "enrich_fields": ["region", "notes"]
+  }
+}
+----
+
+enrich 인덱스 생성
+[]
+----
+POST _enrich/policy/olympic-noc-append/_execute
+----
+
+enrich 파이프 라인 생성
+[]
+----
+PUT _ingest/pipeline/enrich-noc
+{
+  "processors": [
+    {
+      "enrich": {
+        "policy_name": "olympic-noc-append",
+        "field": "noc",
+        "target_field": "nocDetails"
+      }
+    }
+  ]
+}
+----
 
 == Exercise 30
-Create a new index called olympic-events-enriched, into which we can reindex the Olympic events but with some enriched fields. Change the mapping settings for the new index so we can add fields dynamically.
+Create a new index called `olympic-events-enriched`, into which we can reindex the Olympic events but with some enriched fields. Change the mapping settings for the new index so we can add fields dynamically.
+
+`olympic-events-enriched` 라는 새 인덱스를 만듭니다. 이 인덱스로 올림픽 이벤트를 재색인 할 수 있지만 일부 강화된 필드가 있습니다. 필드를 동적으로 추가할 수 있도록 새 인덱스에 대한 매핑 설정을 변경합니다.
+
+=== Solution
+인덱스 생성
+[]
+----
+PUT olympic-events-enriched
+----
+
+동적 변경 허용
+[]
+----
+PUT olympic-events-enriched/_mapping
+{
+  "dynamic": "true"
+}
+----
 
 == Exercise 31
-Reindex the olympic-events-fixed index into olympic-events-enriched, running it through the enrich-noc ingest pipeline. Once complete, verify the new field was added to the olympic-events-fixed index, and populated with details of the associated NOC.
+Reindex the `olympic-events-fixed` index into `olympic-events-enriched`, running it through the `enrich-noc` ingest pipeline. Once complete, verify the new field was added to the `olympic-events-fixed` index, and populated with details of the associated NOC.
+
+
+`olympic-events-fixed` 인덱스를 `olympic-events-enriched` 로 재색인하여 `enrich-noc` 수집 파이프라인을 통해 실행합니다. 완료되면 새 필드가 `olympic-events-fixed` 인덱스에 추가되었고 관련 NOC의 세부정보가 채워졌는지 확인하세요.
+
+=== Solution
+재색인 결과
+[]
+----
+POST _reindex
+{
+  "source": {
+    "index": "olympic-events-fixed"
+  },
+  "dest": {
+    "index": "olympic-events-enriched",
+    "pipeline": "enrich-noc"
+  }
+}
+
+----
