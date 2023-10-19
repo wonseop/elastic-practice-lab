@@ -1,0 +1,91 @@
+
+== Task 1
+
+Write a single search on the `stock-prices` index on `cluster1` that satisfies the following requirements:
+
+- return the stock with the highest daily `volume` of the month
+- return 0 documents
+
+In the text field below, provide your entire search request:
+
+
+다음 요구 사항을 충족하는 `cluster1`의 `stock-price` 인덱스에 대한 단일 검색을 작성합니다:
+
+- 해당 월의 일일 `volume` 이 가장 높은 주식을 반환합니다.
+- 0개의 문서를 반환합니다.
+
+아래 텍스트 필드에 전체 검색 요청을 입력하세요:
+
+=== Solution
+
+[]
+----
+GET stock-prices/_search
+{
+  "size": 0,
+  "aggs": {
+    "monthly": {
+      "date_histogram": {
+        "field": "@timestamp",
+        "calendar_interval": "month"
+      },
+      "aggs": {
+        "max_volume": {
+          "max": {
+            "field": "volume"
+          }
+        }
+      }
+    }
+  }
+}
+----
+
+== Task 2
+
+The `earthquakes` index on `cluster1` contains documents that have the following format:
+
+[]
+----
+{
+    "Magnitude": 6,
+    "Depth": 205.4,
+    "Type": "Earthquake",
+    "MagnitudeType": "MWC",
+    "MagnitudeError": null,
+    "location": {
+        "lon": "-175.85",
+        "lat": "-19.614"
+    },
+    "ID": "USP000DWTG",
+    "timestamp": "08/06/2005 09:56:14"
+}
+----
+
+Create a new map that satisfies the following requirements:
+- displays an icon for each earthquake
+- the size of the icon is based on the Magnitude field
+- the map is saved as task2
+
+=== Solution
+N/A
+
+== Task 3
+
+Define a new data stream on `cluster1` that satisfies the following requirements:
+
+- the index pattern is `logs-my_app-production`
+- the corresponding index template is named `task3`
+- the data is hot for 3 minutes, then immediately rolls over to warm
+- the data is warm for 5 minutes, then rolls over to cold
+- 10 minutes after rolling over, the data is deleted
+
+=== Solution
+
+[]
+----
+POST logs-my_app-roduction/_doc
+{
+  "just": "starting the data stream"
+}
+----
