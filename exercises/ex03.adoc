@@ -1,0 +1,1021 @@
+= Exercises 3
+
+== Exercise 19
+Write a single query to find the name of all Gymnastics events. There are less than 100 Gymnastics event types.
+
+모든 체조(Gymnastics) 이벤트의 이름을 찾으려면 단일 쿼리를 작성하세요. 체조 종목 유형은 100개 미만입니다.
+
+=== Solution
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "size": 0,
+  "query": {
+    "match": {
+      "sport": "Gymnastics"
+    }
+  },
+  "aggs": {
+    "gymnastics_event": {
+      "terms": {
+        "field": "event.keyword",
+        "size": 100
+      }
+    }
+  }
+}
+----
+결과
+[]
+----
+{
+  "took" : 6,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "gymnastics_event" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "Gymnastics Men's Individual All-Around",
+          "doc_count" : 1408
+        },
+        {
+          "key" : "Gymnastics Men's Parallel Bars",
+          "doc_count" : 1379
+        },
+        {
+          "key" : "Gymnastics Men's Floor Exercise",
+          "doc_count" : 1376
+        },
+        {
+          "key" : "Gymnastics Men's Horizontal Bar",
+          "doc_count" : 1376
+        },
+        {
+          "key" : "Gymnastics Men's Pommelled Horse",
+          "doc_count" : 1376
+        },
+        {
+          "key" : "Gymnastics Men's Rings",
+          "doc_count" : 1365
+        },
+        {
+          "key" : "Gymnastics Women's Individual All-Around",
+          "doc_count" : 1328
+        },
+        {
+          "key" : "Gymnastics Women's Uneven Bars",
+          "doc_count" : 1322
+        },
+        {
+          "key" : "Gymnastics Women's Balance Beam",
+          "doc_count" : 1319
+        },
+        {
+          "key" : "Gymnastics Women's Floor Exercise",
+          "doc_count" : 1315
+        },
+        {
+          "key" : "Gymnastics Men's Horse Vault",
+          "doc_count" : 1220
+        },
+        {
+          "key" : "Gymnastics Men's Team All-Around",
+          "doc_count" : 1181
+        },
+        {
+          "key" : "Gymnastics Women's Horse Vault",
+          "doc_count" : 1139
+        },
+        {
+          "key" : "Gymnastics Women's Team All-Around",
+          "doc_count" : 1098
+        },
+        {
+          "key" : "Rhythmic Gymnastics Women's Group",
+          "doc_count" : 365
+        },
+        {
+          "key" : "Rhythmic Gymnastics Women's Individual",
+          "doc_count" : 250
+        },
+        {
+          "key" : "Gymnastics Women's Team Portable Apparatus",
+          "doc_count" : 54
+        },
+        {
+          "key" : "Gymnastics Men's Individual All-Around, Apparatus Work",
+          "doc_count" : 4
+        },
+        {
+          "key" : "Gymnastics Men's Individual All-Around, Field Sports",
+          "doc_count" : 4
+        },
+        {
+          "key" : "Gymnastics Men's Rope Climbing",
+          "doc_count" : 3
+        },
+        {
+          "key" : "Gymnastics Men's Horizontal Bar, Teams",
+          "doc_count" : 1
+        },
+        {
+          "key" : "Gymnastics Men's Individual All-Around, 5 Events",
+          "doc_count" : 1
+        },
+        {
+          "key" : "Gymnastics Men's Parallel Bars, Teams",
+          "doc_count" : 1
+        },
+        {
+          "key" : "Gymnastics Men's Team All-Around, Swedish System",
+          "doc_count" : 1
+        }
+      ]
+    }
+  }
+}
+----
+
+== Exercise 20
+Write a single query to find the average weight for male and female competitors in Gymnastics events.
+
+체조(Gymnastics) 경기에 참가하는 남성 및 여성 참가자의 평균 체중을 구하는 단일 쿼리를 작성하세요.
+
+=== Solution
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "size": 0,
+  "query": {
+    "term": {
+      "sport": "Gymnastics"
+    }
+  },
+  "aggs": {
+    "genders": {
+      "terms": {
+        "field": "gender"
+      },
+      "aggs": {
+        "avg_weight": {
+          "avg": {
+            "field": "weight"
+          }
+        }
+      }
+    }
+  }
+}
+----
+결과
+[]
+----
+{
+  "took" : 3,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : null,
+    "hits" : [ ]
+  },
+  "aggregations" : {
+    "genders" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "M",
+          "doc_count" : 10696,
+          "avg_weight" : {
+            "value" : 63.31937172774869
+          }
+        },
+        {
+          "key" : "F",
+          "doc_count" : 7575,
+          "avg_weight" : {
+            "value" : 47.792739273927396
+          }
+        }
+      ]
+    }
+  }
+}
+----
+
+== Exercise 21
+Write a single query to find the year that each of the 590 unique events first appeared in the Olympic Games, and which events were introduced most recently.
+
+590개의 고유 이벤트가 각각 올림픽 게임에 처음 등장한 연도와 가장 최근에 소개된 이벤트를 찾는 단일 쿼리를 작성합니다.
+
+=== Solution
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "size": 0,
+  "aggs": {
+    "events": {
+      "terms": {
+        "field": "event.keyword",
+        "size": 590
+      },
+      "aggs": {
+        "first_year": {
+          "min": {
+            "field": "year"
+          }
+        }
+      }
+    },
+    "most_recent": {
+      "max_bucket": {
+        "buckets_path": "events>first_year"
+      }
+    }
+  }
+}
+----
+결과
+[]
+----
+{
+  ...
+  "aggregations" : {
+    "events" : {
+      "doc_count_error_upper_bound" : 0,
+      "sum_other_doc_count" : 0,
+      "buckets" : [
+        {
+          "key" : "Ice Hockey Men's Ice Hockey",
+          "doc_count" : 3825,
+          "first_year" : {
+            "value" : 1920.0
+          }
+        },
+        {
+          "key" : "Football Men's Football",
+          "doc_count" : 3459,
+          "first_year" : {
+            "value" : 1908.0
+          }
+        },
+        ...
+    },
+    "most_recent" : {
+      "value" : 2016.0,
+      "keys" : [
+        "Rugby Sevens Men's Rugby Sevens",
+        "Rugby Sevens Women's Rugby Sevens",
+        "Golf Women's Individual",
+        "Golf Men's Individual",
+        "Sailing Women's Skiff",
+        "Wrestling Women's Featherweight, Freestyle",
+        "Wrestling Women's Light-Heavyweight, Freestyle"
+      ]
+    }
+  }
+}
+----
+
+
+== Exercise 22
+Write a query to return only the following fields for the 50 tallest athletes in the 2016 Rio de Janeiro Games:
+
+2016년 리우데자네이루 올림픽에서 가장 키가 큰 선수 50명에 대해 다음 필드만 반환하는 쿼리를 작성하세요:
+
+* athleteName
+* team
+* sport
+* age
+* height
+* weight
+* gender
+
+=== Solution
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "_source": [
+    "athleteName",
+    "team",
+    "sport",
+    "age",
+    "height",
+    "weight",
+    "gender"
+  ],
+  "query": {
+    "term": {
+      "year": {
+        "value": 2016
+      }
+    }
+  }
+}
+----
+결과
+[]
+----
+{
+  "took" : 1,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pBqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "athleteName" : "Apostolos Khristou",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pRqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "athleteName" : "Apostolos Khristou",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "phqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "athleteName" : "Apostolos Khristou",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pxqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "athleteName" : "Apostolos Khristou",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "qhqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "92",
+          "team" : "Greece",
+          "athleteName" : "Ioannis Khristou",
+          "sport" : "Rowing",
+          "age" : "33",
+          "height" : "190"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "RBqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "F",
+          "weight" : "60",
+          "team" : "Armenia",
+          "athleteName" : "Diana Khubeseryan",
+          "sport" : "Athletics",
+          "age" : "22",
+          "height" : "170"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "SxqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "F",
+          "weight" : "78",
+          "team" : "Belarus",
+          "athleteName" : "Olga Sergeyevna Khudenko",
+          "sport" : "Canoeing",
+          "age" : "24",
+          "height" : "178"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "VBqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "83",
+          "team" : "Kazakhstan",
+          "athleteName" : "Vitaly Khudyakov",
+          "sport" : "Swimming",
+          "age" : "21",
+          "height" : "186"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "VxqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "75",
+          "team" : "South Africa",
+          "athleteName" : "Itumeleng Isaack Khune",
+          "sport" : "Football",
+          "age" : "29",
+          "height" : "184"
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "chqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "85",
+          "team" : "Ukraine",
+          "athleteName" : "Maksym Volodymyrovych Khvorost",
+          "sport" : "Fencing",
+          "age" : "34",
+          "height" : "186"
+        }
+      }
+    ]
+  }
+}
+----
+
+== Exercise 23
+The weight and height fields are in metric. Weight is in kg and height is in cm. Add a scripted field called weightLbs to the previous query to return the weight in lbs. The formula for this is: Weight * 2.2
+
+체중 및 신장 필드는 미터법 단위입니다. 체중은 kg, 키는 cm 단위입니다. 무게를 파운드 단위로 반환하려면 이전 쿼리에 WeightLbs라는 스크립트 필드를 추가하세요. 이에 대한 공식은 다음과 같습니다: 무게 * 2.2
+
+=== Solution
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "_source": [
+    "athleteName.keyword",
+    "team",
+    "sport",
+    "age",
+    "height",
+    "weight",
+    "gender"
+  ],
+  "script_fields": {
+    "weightLbs": {
+      "script": {
+        "source": "doc['weight'].value * 2.2"
+      }
+    }
+  },
+  "query": {
+    "term": {
+      "year": {
+        "value": 2016
+      }
+    }
+  }
+}
+----
+결과
+[]
+----
+{
+  "took" : 52,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pBqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pRqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "phqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pxqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "qhqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "92",
+          "team" : "Greece",
+          "sport" : "Rowing",
+          "age" : "33",
+          "height" : "190"
+        },
+        "fields" : {
+          "weightLbs" : [
+            202.4
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "RBqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "F",
+          "weight" : "60",
+          "team" : "Armenia",
+          "sport" : "Athletics",
+          "age" : "22",
+          "height" : "170"
+        },
+        "fields" : {
+          "weightLbs" : [
+            132.0
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "SxqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "F",
+          "weight" : "78",
+          "team" : "Belarus",
+          "sport" : "Canoeing",
+          "age" : "24",
+          "height" : "178"
+        },
+        "fields" : {
+          "weightLbs" : [
+            171.60000000000002
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "VBqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "83",
+          "team" : "Kazakhstan",
+          "sport" : "Swimming",
+          "age" : "21",
+          "height" : "186"
+        },
+        "fields" : {
+          "weightLbs" : [
+            182.60000000000002
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "VxqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "75",
+          "team" : "South Africa",
+          "sport" : "Football",
+          "age" : "29",
+          "height" : "184"
+        },
+        "fields" : {
+          "weightLbs" : [
+            165.0
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "chqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "85",
+          "team" : "Ukraine",
+          "sport" : "Fencing",
+          "age" : "34",
+          "height" : "186"
+        },
+        "fields" : {
+          "weightLbs" : [
+            187.00000000000003
+          ]
+        }
+      }
+    ]
+  }
+}
+----
+
+== Exercise 24
+Add a scripted field called bmi to the previous query to return the BMI for each athlete, calculated using the following formula: Weight / (Height in m squared)
+
+이전 쿼리에 bmi라는 스크립트 필드를 추가하여 다음 공식을 사용하여 계산된 각 운동선수의 BMI를 반환합니다. 체중/((신장/100)의 제곱)
+
+=== Solution
+[]
+----
+GET olympic-events-fixed/_search
+{
+  "_source": [
+    "athleteName.keyword",
+    "team",
+    "sport",
+    "age",
+    "height",
+    "weight",
+    "gender"
+  ],
+  "script_fields": {
+    "weightLbs": {
+      "script": {
+        "source": "doc['weight'].value * 2.2"
+      }
+    },
+    "bmi": {
+      "script": {
+        "source": "doc['weight'].value / (Math.pow(doc['height'].value / 100.0f, 2))"
+      }
+    }
+  },
+  "query": {
+    "term": {
+      "year": {
+        "value": 2016
+      }
+    }
+  }
+}
+----
+
+결과
+[]
+----
+{
+  "took" : 60,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 1,
+    "successful" : 1,
+    "skipped" : 0,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : {
+      "value" : 10000,
+      "relation" : "gte"
+    },
+    "max_score" : 1.0,
+    "hits" : [
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pBqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ],
+          "bmi" : [
+            22.446688680894557
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pRqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ],
+          "bmi" : [
+            22.446688680894557
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "phqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ],
+          "bmi" : [
+            22.446688680894557
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "pxqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "88",
+          "team" : "Greece",
+          "sport" : "Swimming",
+          "age" : "19",
+          "height" : "198"
+        },
+        "fields" : {
+          "weightLbs" : [
+            193.60000000000002
+          ],
+          "bmi" : [
+            22.446688680894557
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "qhqJO4sB9RbpwGsWzY6s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "92",
+          "team" : "Greece",
+          "sport" : "Rowing",
+          "age" : "33",
+          "height" : "190"
+        },
+        "fields" : {
+          "weightLbs" : [
+            202.4
+          ],
+          "bmi" : [
+            25.4847651825196
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "RBqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "F",
+          "weight" : "60",
+          "team" : "Armenia",
+          "sport" : "Athletics",
+          "age" : "22",
+          "height" : "170"
+        },
+        "fields" : {
+          "weightLbs" : [
+            132.0
+          ],
+          "bmi" : [
+            20.761244510066017
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "SxqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "F",
+          "weight" : "78",
+          "team" : "Belarus",
+          "sport" : "Canoeing",
+          "age" : "24",
+          "height" : "178"
+        },
+        "fields" : {
+          "weightLbs" : [
+            171.60000000000002
+          ],
+          "bmi" : [
+            24.618104566157502
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "VBqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "83",
+          "team" : "Kazakhstan",
+          "sport" : "Swimming",
+          "age" : "21",
+          "height" : "186"
+        },
+        "fields" : {
+          "weightLbs" : [
+            182.60000000000002
+          ],
+          "bmi" : [
+            23.9912124879486
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "VxqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "75",
+          "team" : "South Africa",
+          "sport" : "Football",
+          "age" : "29",
+          "height" : "184"
+        },
+        "fields" : {
+          "weightLbs" : [
+            165.0
+          ],
+          "bmi" : [
+            22.152645699113442
+          ]
+        }
+      },
+      {
+        "_index" : "olympic-events-fixed",
+        "_id" : "chqJO4sB9RbpwGsWzY-s",
+        "_score" : 1.0,
+        "_source" : {
+          "gender" : "M",
+          "weight" : "85",
+          "team" : "Ukraine",
+          "sport" : "Fencing",
+          "age" : "34",
+          "height" : "186"
+        },
+        "fields" : {
+          "weightLbs" : [
+            187.00000000000003
+          ],
+          "bmi" : [
+            24.5693139936823
+          ]
+        }
+      }
+    ]
+  }
+}
+----

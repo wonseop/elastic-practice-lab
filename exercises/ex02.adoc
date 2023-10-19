@@ -1,12 +1,12 @@
+= Exercises 2
 
-
-== Question 13
+== Exercise 13
 
 Reindex the data in the `olympic-events` index into the new `olympic-events-fixed` index created in exercise 12 using the `split_games` pipeline created in exercise 10.
 
-Question 10에서 생성된 `split_games` 파이프라인을 사용하여 `olympic-events` 인덱스의 데이터를 Question 12에서 생성된 새로운 `olympic-events-fixed` 인덱스로 다시 인덱싱하세요.
+Exercise 10에서 생성된 `split_games` 파이프라인을 사용하여 `olympic-events` 인덱스의 데이터를 Exercise 12에서 생성된 새로운 `olympic-events-fixed` 인덱스로 다시 인덱싱하세요.
 
-=== Answer
+=== Solution
 [source]
 ----
 POST _reindex
@@ -25,7 +25,7 @@ POST olympic-events-fixed/_refresh
 ----
 
 
-== Question 14
+== Exercise 14
 
 Look at the mapping for the `olympic-events-fixed` index. Notice how Elasticsearch has created new fields. We created the mapping for this index with the same field names as before but we put all the field names in lowercase. Field names are case sensitive, so `Age` and `age` are different, distinct fields to Elasticsearch.
 
@@ -43,7 +43,7 @@ Create an index template called `olympic-events` for new indices with a name beg
 
 이름이 `olympic-events-`로 시작하는 새 인덱스에 대해 `olympic-events`라는 인덱스 템플릿을 만듭니다. 연습 12에서 정의한 매핑과 설정을 사용하고 문서에 매핑에 정의되지 않은 필드가 포함된 경우 Elasticsearch에서 예외가 발생하도록 매핑을 구성하세요.
 
-=== Answer
+=== Solution
 1. mapping 정보를 확인
 []
 ----
@@ -265,13 +265,13 @@ PUT _index_template/olympic-events
 ----
 
 
-== Question 15
+== Exercise 15
 
 Create a new ingest pipeline called `reconcile_fields` to replace all fields with their correct field names (except for the `Games` field), then also execute the `split_games` pipeline.
 
 `reconcile_fields` 라는 새로운 ingest pipeline을 생성하여 모든 필드를 올바른 필드 이름으로 바꾼 다음(`Games` 필드 제외), `split_games` 파이프라인도 실행합니다.
 
-=== Answer
+=== Solution
 []
 ----
 PUT _ingest/pipeline/reconcile_fields
@@ -358,7 +358,7 @@ PUT _ingest/pipeline/reconcile_fields
 }
 ----
 
-== Question 16
+== Exercise 16
 Test your new pipeline with the following document:
 
 다음 문서를 사용하여 새 파이프라인을 테스트하세요:
@@ -382,7 +382,7 @@ Test your new pipeline with the following document:
 }
 ----
 
-=== Answer
+=== Solution
 []
 ----
 POST _ingest/pipeline/reconcile_fields/_simulate
@@ -441,23 +441,23 @@ POST _ingest/pipeline/reconcile_fields/_simulate
 ----
 
 
-== Question 17
+== Exercise 17
 Delete the `olympic-events-fixed` index.
 
 `olympic-events-fixed` 인덱스를 삭제하세요.
 
-=== Answer
+=== Solution
 []
 ----
 DELETE olympic-events-fixed
 ----
 
-== Question 18
+== Exercise 18
 Reindex the data in the `olympic-events` index into a new `olympic-events-fixed` index using the `reconcile_fields` pipeline. If Elasticsearch throws any exceptions, you may have missed a field in your pipeline.
 
 `reconcile_fields` 파이프라인을 사용하여 `olympic-events` 인덱스의 데이터를 새로운 `olympic-events-fixed` 인덱스로 재색인하십시오. Elasticsearch에서 예외가 발생하면 파이프라인에서 필드를 놓친 것일 수 있습니다.
 
-=== Answer
+=== Solution
 []
 ----
 POST _reindex
